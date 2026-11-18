@@ -1,0 +1,23 @@
+name: Build ARM64 AppImages
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'outputs/build-arm64.sh'
+      - 'outputs/build-arm64.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build AppImages
+        run: bash outputs/build-arm64.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sigrok-appimages-aarch64
+          path: dist/*
