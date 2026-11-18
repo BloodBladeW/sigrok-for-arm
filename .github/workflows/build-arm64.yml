@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'outputs/build-arm64.sh'
-      - 'outputs/build-arm64.yml'
+      - 'build-arm64.sh'
+      - 'build-arm64.yml'
 
 permissions:
   contents: read
