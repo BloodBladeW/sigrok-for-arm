@@ -23,6 +23,8 @@ sudo apt-get install -y --no-install-recommends \
 git clone --depth=1 https://github.com/sigrokproject/sigrok-util.git "$WORK/sigrok-util"
 export TGT="$PREFIX"
 export INSTALL_DIR="$PREFIX"
+sed -i 's|^PREFIX=\$HOME/sr$|PREFIX=$TGT|' \
+  "$WORK/sigrok-util/cross-compile/linux/sigrok-cross-linux"
 export PATH="$PREFIX/bin:$PATH"
 export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PREFIX/lib/aarch64-linux-gnu/pkgconfig"
 export LD_LIBRARY_PATH="$PREFIX/lib:$PREFIX/lib/aarch64-linux-gnu:${LD_LIBRARY_PATH:-}"
