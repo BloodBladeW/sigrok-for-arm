@@ -15,7 +15,7 @@ sudo apt-get install -y --no-install-recommends \
   python3 python3-dev python3-setuptools python3-numpy python3-gi swig doxygen \
   libglib2.0-dev libglibmm-2.4-dev libzip-dev libserialport-dev libusb-1.0-0-dev \
   libftdi1-dev libhidapi-dev libbluetooth-dev libieee1284-3-dev \
-  libboost-dev libboost-filesystem-dev libboost-system-dev libboost-serialization-dev \
+  libboost-dev libboost-filesystem-dev libboost-system-dev libboost-serialization-dev libboost-test-dev \
   qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtwayland5 \
   libqt5serialport5-dev libqt5opengl5-dev libqwt-qt5-dev zsync file patchelf curl
 
@@ -106,3 +106,4 @@ make_appdir pulseview-NIGHTLY-aarch64.AppImage pulseview PulseView
 make_appdir sigrok-cli-NIGHTLY-aarch64.AppImage sigrok-cli sigrok-cli
 file "$OUT"/*.AppImage
 sha256sum "$OUT"/*.AppImage > "$OUT/SHA256SUMS"
+
