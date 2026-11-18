@@ -85,8 +85,8 @@ export PYTHONPATH="\$PYTHONHOME/lib/python$pyver/site-packages"
 export SIGROK_FIRMWARE_PATH="\$HERE/usr/share/sigrok-firmware:\${SIGROK_FIRMWARE_PATH:-}"
 export SIGROKDECODE_PATH="\$HERE/usr/share/libsigrokdecode/decoders:\${SIGROKDECODE_PATH:-}"
 export LD_LIBRARY_PATH="\$HERE/usr/lib:\$HERE/usr/lib/aarch64-linux-gnu:\${LD_LIBRARY_PATH:-}"
-for hook in "$\{HERE\}"/apprun-hooks/*.sh; do
-  [ -f "$\{hook\}" ] && . "$\{hook\}"
+for hook in "\$HERE"/apprun-hooks/*.sh; do
+  [ -f "\$hook" ] && . "\$hook"
 done
 exec "\$HERE/usr/bin/$bin" "\$@"
 EOF
