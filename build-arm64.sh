@@ -15,8 +15,9 @@ sudo apt-get install -y --no-install-recommends \
   python3 python3-dev python3-setuptools python3-numpy python3-gi swig doxygen \
   libglib2.0-dev libglibmm-2.4-dev libzip-dev libserialport-dev libusb-1.0-0-dev \
   libftdi1-dev libhidapi-dev libbluetooth-dev libieee1284-3-dev \
-  libboost-dev qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev \
-  libqt5serialport5-dev libqt5opengl5-dev libqwt-qt5-dev zsync file patchelf
+  libboost-dev libboost-filesystem-dev libboost-system-dev libboost-serialization-dev \
+  qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtwayland5 \
+  libqt5serialport5-dev libqt5opengl5-dev libqwt-qt5-dev zsync file patchelf curl
 
 # Build all upstream components in their documented dependency order.
 git clone --depth=1 https://github.com/sigrokproject/sigrok-util.git "$WORK/sigrok-util"
@@ -59,6 +60,13 @@ Categories=Development;Electronics;
 Terminal=$( [[ "$bin" == "sigrok-cli" ]] && echo true || echo false )
 EOF
   cp "$APPDIR/$bin.desktop" "$APPDIR/usr/share/applications/"
+  cat > "$APPDIR/$bin.svg" <<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect x="16" y="16" width="224" height="224" rx="32" fill="#183153"/>
+  <path d="M32 132h48l22-56 38 104 25-64 18 16h41" fill="none" stroke="#63d9e8" stroke-linecap="round" stroke-linejoin="round" stroke-width="14"/>
+</svg>
+SVG
+  cp "$APPDIR/$bin.svg" "$APPDIR/usr/share/icons/hicolor/256x256/apps/$bin.svg"
   # Keep Python protocol decoders and firmware discoverable inside the image.
   local pyver
   pyver="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
@@ -70,21 +78,27 @@ EOF
 #!/bin/sh
 HERE="\$(dirname "\$(readlink -f "\$0")")"
 export PYTHONHOME="\$HERE/usr/share/pyshared"
-export PYTHONPATH="\$PYTHONHOME/lib/python$pyver/site-packages:\${PYTHONPATH:-}"
+export PYTHONPATH="\$PYTHONHOME/lib/python$pyver/site-packages"
 export SIGROK_FIRMWARE_PATH="\$HERE/usr/share/sigrok-firmware:\${SIGROK_FIRMWARE_PATH:-}"
 export SIGROKDECODE_PATH="\$HERE/usr/share/libsigrokdecode/decoders:\${SIGROKDECODE_PATH:-}"
 export LD_LIBRARY_PATH="\$HERE/usr/lib:\$HERE/usr/lib/aarch64-linux-gnu:\${LD_LIBRARY_PATH:-}"
 exec "\$HERE/usr/bin/$bin" "\$@"
 EOF
   chmod +x "$APPDIR/AppRun"
-  APPIMAGE_EXTRACT_AND_RUN=1 ARCH=aarch64 "$TOOLS/linuxdeploy-aarch64.AppImage" \
-    --appdir "$APPDIR" --executable "$APPDIR/usr/bin/$bin" --output appimage \
-    $( [[ "$bin" == "pulseview" ]] && printf '%s' '--plugin qt' )
-  local generated
-  generated="$(find "$WORK" -maxdepth 2 -type f -name '*.AppImage' -printf '%T@ %p\n' | sort -nr | head -1 | cut -d' ' -f2-)"
-  test -n "$generated"
-  install -m 755 "$generated" "$OUT/$app"
-  rm -f "$generated"
+  rm -f "$WORK/$app"
+  local -a deploy_args=(--appdir "$APPDIR" --executable "$APPDIR/usr/bin/$bin" --output appimage --custom-apprun "$APPDIR/AppRun")
+  if [[ "$bin" == "pulseview" ]]; then
+    deploy_args+=(--plugin qt)
+    EXTRA_PLATFORM_PLUGINS='libqwayland-egl.so;libqwayland-generic.so' \
+      OUTPUT="$WORK/$app" APPIMAGE_EXTRACT_AND_RUN=1 ARCH=aarch64 \
+      "$TOOLS/linuxdeploy-aarch64.AppImage" "${deploy_args[@]}"
+  else
+    OUTPUT="$WORK/$app" APPIMAGE_EXTRACT_AND_RUN=1 ARCH=aarch64 \
+      "$TOOLS/linuxdeploy-aarch64.AppImage" "${deploy_args[@]}"
+  fi
+  test -s "$WORK/$app"
+  install -m 755 "$WORK/$app" "$OUT/$app"
+  rm -f "$WORK/$app"
 }
 
 cd "$WORK"
