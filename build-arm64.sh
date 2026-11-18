@@ -76,7 +76,8 @@ SVG
   cp -a "/usr/lib/python$pyver" "$APPDIR/usr/share/pyshared/lib/"
   mkdir -p "$APPDIR/usr/share/pyshared/lib/python$pyver/site-packages"
   cp -a /usr/lib/python3/dist-packages/. "$APPDIR/usr/share/pyshared/lib/python$pyver/site-packages/" 2>/dev/null || true
-  cat > "$APPDIR/AppRun" <<EOF
+  local apprun="$WORK/AppRun-$bin"
+  cat > "$apprun" <<EOF
 #!/bin/sh
 HERE="\$(dirname "\$(readlink -f "\$0")")"
 export PYTHONHOME="\$HERE/usr/share/pyshared"
@@ -84,11 +85,14 @@ export PYTHONPATH="\$PYTHONHOME/lib/python$pyver/site-packages"
 export SIGROK_FIRMWARE_PATH="\$HERE/usr/share/sigrok-firmware:\${SIGROK_FIRMWARE_PATH:-}"
 export SIGROKDECODE_PATH="\$HERE/usr/share/libsigrokdecode/decoders:\${SIGROKDECODE_PATH:-}"
 export LD_LIBRARY_PATH="\$HERE/usr/lib:\$HERE/usr/lib/aarch64-linux-gnu:\${LD_LIBRARY_PATH:-}"
+for hook in "$\{HERE\}"/apprun-hooks/*.sh; do
+  [ -f "$\{hook\}" ] && . "$\{hook\}"
+done
 exec "\$HERE/usr/bin/$bin" "\$@"
 EOF
-  chmod +x "$APPDIR/AppRun"
+  chmod +x "$apprun"
   rm -f "$WORK/$app"
-  local -a deploy_args=(--appdir "$APPDIR" --executable "$APPDIR/usr/bin/$bin" --output appimage --custom-apprun "$APPDIR/AppRun")
+  local -a deploy_args=(--appdir "$APPDIR" --executable "$APPDIR/usr/bin/$bin" --output appimage --desktop-file "$APPDIR/$bin.desktop" --custom-apprun "$apprun")
   if [[ "$bin" == "pulseview" ]]; then
     deploy_args+=(--plugin qt)
     EXTRA_PLATFORM_PLUGINS='libqwayland-egl.so;libqwayland-generic.so' \
