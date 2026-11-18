@@ -11,7 +11,7 @@ mkdir -p "$WORK" "$OUT" "$TOOLS"
 
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
-  build-essential git cmake pkg-config autoconf automake libtool sdcc \
+  build-essential git cmake pkg-config autoconf automake libtool sdcc librsvg2-bin \
   python3 python3-dev python3-setuptools python3-numpy python3-gi swig doxygen \
   libglib2.0-dev libglibmm-2.4-dev libzip-dev libserialport-dev libusb-1.0-0-dev \
   libftdi1-dev libhidapi-dev libbluetooth-dev libieee1284-3-dev \
@@ -69,6 +69,7 @@ EOF
 </svg>
 SVG
   cp "$APPDIR/$bin.svg" "$APPDIR/usr/share/icons/hicolor/256x256/apps/$bin.svg"
+  rsvg-convert --width 256 --height 256 "$APPDIR/$bin.svg" > "$APPDIR/$bin.png"
   # Keep Python protocol decoders and firmware discoverable inside the image.
   local pyver
   pyver="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
