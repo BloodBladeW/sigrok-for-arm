@@ -11,7 +11,7 @@ mkdir -p "$WORK" "$OUT" "$TOOLS"
 
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
-  build-essential git cmake pkg-config autoconf automake libtool \
+  build-essential git cmake pkg-config autoconf automake libtool sdcc \
   python3 python3-dev python3-setuptools python3-numpy python3-gi swig doxygen \
   libglib2.0-dev libglibmm-2.4-dev libzip-dev libserialport-dev libusb-1.0-0-dev \
   libftdi1-dev libhidapi-dev libbluetooth-dev libieee1284-3-dev \
