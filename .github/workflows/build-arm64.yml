@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - 'build-arm64.sh'
-      - 'build-arm64.yml'
+      - '.github/workflows/build-arm64.yml'
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build AppImages
-        run: bash outputs/build-arm64.sh
+        run: bash build-arm64.sh
       - uses: actions/upload-artifact@v4
         with:
           name: sigrok-appimages-aarch64
